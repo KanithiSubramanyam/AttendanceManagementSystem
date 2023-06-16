@@ -13,7 +13,9 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
-        "rappasoft/laravel-livewire-tables": "^2.14"
+        "rappasoft/laravel-livewire-tables": "^2.14",
+        "doctrine/dbal": "^3.0"
+
     },
     "require-dev": {
         "fakerphp/faker": "^1.9.1",

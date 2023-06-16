@@ -22,3 +22,6 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 Auth::routes();
 
 Route::resource('employees', App\Http\Controllers\EmployeeController::class);
+Route::resource('joinDates', App\Http\Controllers\JoinDateController::class);
+
+Route::resource('joinDetails', App\Http\Controllers\JoinDetailController::class);

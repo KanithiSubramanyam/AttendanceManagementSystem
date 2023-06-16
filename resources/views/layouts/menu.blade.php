@@ -12,3 +12,14 @@
         <p>Employees</p>
     </a>
 </li>
+
+
+
+<li class="nav-item">
+    <a href="{{ route('joinDetails.index') }}" class="nav-link {{ Request::is('joinDetails*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>Join Details</p>
+    </a>
+</li>
+
+

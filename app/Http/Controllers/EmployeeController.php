@@ -105,6 +105,10 @@ class EmployeeController extends AppBaseController
             $input = $request->all();
             $input['image']=$image_name;
         }
+        else{
+            $input = $request->all();
+
+        }
         $employee = $this->employeeRepository->update($input, $id);
 
         Flash::success('Employee updated successfully.');

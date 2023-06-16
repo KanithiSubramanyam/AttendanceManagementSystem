@@ -21,3 +21,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::resource('employees', App\Http\Controllers\API\EmployeeAPIController::class)
     ->except(['create', 'edit']);
+
+Route::resource('join-dates', App\Http\Controllers\API\JoinDateAPIController::class)
+    ->except(['create', 'edit']);
+
+
+
+Route::resource('join-details', App\Http\Controllers\API\JoinDetailAPIController::class)
+    ->except(['create', 'edit']);
