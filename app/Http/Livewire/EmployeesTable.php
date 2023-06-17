@@ -49,8 +49,20 @@ class EmployeesTable extends DataTableComponent
         ->setTableRowUrl(function($row) {
             return route('employees.show', $row);
         });
+        $this->setThSortButtonAttributes(function(Column $column) {
+            if ($column->isField('name')) {
+              return [
+                'class' => 'bg-green-500',
+              ];
+            }
         
+            return [];
+          });
         
+          $this->setOfflineIndicatorStatus(true);
+          $this->setOfflineIndicatorEnabled();
+          $this->emit('setSort', 'name', 'asc');
+          $this->emit('clearSorts');
 
 
 
@@ -59,15 +71,16 @@ class EmployeesTable extends DataTableComponent
     public function columns(): array
     {
         return [
-            Column::make('id', 'id')
-            ->sortable()
-            ->searchable()
-            ->collapseOnTablet()
-            ->unclickable()
-            ->format(
-                fn( $value, $row, Column $column) => '<span data-id="' . $row->id . '">' . $row->id . '</span>'
-            )
-            ->html(),
+            Column::make("S-No", "id")
+                ->sortable()
+                ->searchable()
+                ->format(
+                    function($value,$row){
+                        static $count = 0;
+                        $count++;
+                        return $count;
+                    }
+                ),
             Column::make("Name", "name")
                 ->sortable()
                 ->searchable()

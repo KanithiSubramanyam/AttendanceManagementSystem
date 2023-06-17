@@ -23,3 +23,11 @@
 </li>
 
 
+
+<li class="nav-item">
+    <a href="{{ route('attendances.index') }}" class="nav-link {{ Request::is('attendances*') ? 'active' : '' }}">
+        <i class="nav-icon fas fa-home"></i>
+        <p>Attendances</p>
+    </a>
+</li>
+

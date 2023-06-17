@@ -6,7 +6,7 @@
             <div class="row mb-2">
                 <div class="col-sm-12">
                     <h1>
-                        Edit Join Detail
+                        Edit Attendance
                     </h1>
                 </div>
             </div>
@@ -19,17 +19,17 @@
 
         <div class="card">
 
-        {!! Form::model($joinDetail, ['route' => ['joinDetails.update', $joinDetail->id], 'method' => 'patch','files'=>'true']) !!}
+        {!! Form::model($attendance, ['route' => ['attendances.update', $attendance->id], 'method' => 'patch','files'=>'true']) !!}
 
             <div class="card-body">
                 <div class="row">
-                    @include('join_details.fields')
+                    @include('attendances.fields')
                 </div>
             </div>
 
             <div class="card-footer">
                 {!! Form::submit('Save', ['class' => 'btn btn-primary']) !!}
-                <a href="{{ route('joinDetails.index') }}" class="btn btn-default"> Cancel </a>
+                <a href="{{ route('attendances.index') }}" class="btn btn-default"> Cancel </a>
             </div>
 
             {!! Form::close() !!}

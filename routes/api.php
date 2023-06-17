@@ -29,3 +29,9 @@ Route::resource('join-dates', App\Http\Controllers\API\JoinDateAPIController::cl
 
 Route::resource('join-details', App\Http\Controllers\API\JoinDetailAPIController::class)
     ->except(['create', 'edit']);
+
+Route::resource('attendances', App\Http\Controllers\API\AttendanceAPIController::class)
+    ->except(['create', 'edit']);
+
+Route::resource('demos', App\Http\Controllers\API\demoAPIController::class)
+    ->except(['create', 'edit']);

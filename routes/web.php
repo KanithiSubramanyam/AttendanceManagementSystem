@@ -25,3 +25,6 @@ Route::resource('employees', App\Http\Controllers\EmployeeController::class);
 Route::resource('joinDates', App\Http\Controllers\JoinDateController::class);
 
 Route::resource('joinDetails', App\Http\Controllers\JoinDetailController::class);
+
+Route::resource('attendances', App\Http\Controllers\AttendanceController::class);
+Route::resource('demos', App\Http\Controllers\demoController::class);

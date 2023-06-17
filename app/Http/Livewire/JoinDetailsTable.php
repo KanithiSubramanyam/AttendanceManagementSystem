@@ -23,12 +23,26 @@ class JoinDetailsTable extends DataTableComponent
 
     public function configure(): void
     {
-        $this->setPrimaryKey('id');
+        $this->setPrimaryKey('id')
+        ->setTableRowUrl(function($row) {
+            return route('employees.show', $row);
+        });
     }
 
     public function columns(): array
     {
         return [
+            Column::make("S-No", "id")
+            ->sortable()
+            ->searchable()
+            ->unclickable()
+            ->format(
+                function($value,$row){
+                    static $count = 0;
+                    $count++;
+                    return $count;
+                }
+            ),
             Column::make("Employee Name", "employee_id")
                 ->sortable()
                 ->searchable()
@@ -40,6 +54,7 @@ class JoinDetailsTable extends DataTableComponent
             Column::make("Join Date", "join_date")
                 ->sortable()
                 ->searchable()
+                ->unclickable()
                 ->format(
                     function($value,$row){
                         return date('d/m/Y',strtotime( $value));

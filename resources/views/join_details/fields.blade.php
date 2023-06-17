@@ -5,7 +5,7 @@
 </div>
 
 <!-- Join Date Field -->
-<div class="form-group col-sm-3">
+<div class="form-group col-sm-2">
     {!! Form::label('join_date', 'Join Date:') !!}
     {!! Form::date('join_date', null, ['class' => 'form-control','id'=>'join_date']) !!}
 </div>
