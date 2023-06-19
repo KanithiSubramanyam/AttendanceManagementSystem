@@ -35,12 +35,13 @@ class AttendanceController extends AppBaseController
      * Store a newly created Attendance in storage.
      */
     public function store(CreateAttendanceRequest $request)
-    {   static $count = 1;
+    {  
         $input = $request->all();
-        if ($request->s_no === null) {
-            $request->s_no = $count;
-            $count++;
-        }
+        $maxSerialNumber = Attendance::max('s_no'); // Set the new serial number
+        $input['s_no'] = $maxSerialNumber + 1;
+        $maxSortNumber = Attendance::max('sort'); // Set the new serial number
+        $input['sort'] = $maxSortNumber + 1;
+    
         /** @var Attendance $attendance */
         $name = $request->input('name');// The name for which you want to check
         $date = $request->input('date'); // The date you want to check
@@ -55,9 +56,10 @@ class AttendanceController extends AppBaseController
             Flash::error('Attendance date already exist.');
 
             return redirect(route('attendances.index'));
-        } else {
-            $attendance = Attendance::create($input);
+        } else { 
 
+            $attendance = Attendance::create($input);
+           
             Flash::success('Attendance saved successfully.');
     
             return redirect(route('attendances.index'));
@@ -154,11 +156,6 @@ class AttendanceController extends AppBaseController
         }
     }
     }
-
-
-
-    
-
     /**
      * Remove the specified Attendance from storage.
      *
@@ -168,17 +165,12 @@ class AttendanceController extends AppBaseController
     {
         /** @var Attendance $attendance */
         $attendance = Attendance::find($id);
-
-        if (empty($attendance)) {
-            Flash::error('Attendance not found');
-
+        dd($attendance);
+            $attendance->delete();
+            Flash::success('Attendance deleted successfully.');
             return redirect(route('attendances.index'));
-        }
-
-        $attendance->delete();
-
-        Flash::success('Attendance deleted successfully.');
-
-        return redirect(route('attendances.index'));
+       
     }
+    
+
 }

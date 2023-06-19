@@ -13,7 +13,9 @@ class Attendance extends Model
         'attendance',
         'reason',
         'date',
-        's_no'
+        's_no',
+        'sort',
+   
     ];
 
     protected $casts = [
@@ -21,7 +23,8 @@ class Attendance extends Model
         'attendance' => 'string',
         'reason' => 'string',
         'date' => 'date',
-        's_no' => 'integer'
+
+
     ];
 
     public static array $rules = [
@@ -30,7 +33,7 @@ class Attendance extends Model
         'date' => 'required',
 
     ];
-
+   
     public function employee(){
         return $this->belongsTo(Employee::class, 'name','id');
     }

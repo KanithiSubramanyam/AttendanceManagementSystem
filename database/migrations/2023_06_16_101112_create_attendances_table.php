@@ -15,6 +15,8 @@ return new class extends Migration
     {
         Schema::create('attendances', function (Blueprint $table) {
             $table->id('id');
+            $table->integer('s_no')->nullable();
+            $table->integer('sort')->nullable();
             $table->bigInteger('name')->unsigned();
             $table->string('attendance');
             $table->string('reason')->nullable();

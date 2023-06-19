@@ -1,8 +1,11 @@
 <?php
 
 namespace App\Http\Livewire;
+use App\Models\User;
+use Rappasoft\LaravelLivewireTables\Views\Columns\BooleanColumn;
+use Rappasoft\LaravelLivewireTables\Views\Columns\ButtonGroupColumn;
+use Rappasoft\LaravelLivewireTables\Views\Filters\TextFilter;
 use Illuminate\Database\Eloquent\Builder;
-
 use Laracasts\Flash\Flash;
 use Rappasoft\LaravelLivewireTables\DataTableComponent;
 use Rappasoft\LaravelLivewireTables\Views\Column;
@@ -11,15 +14,29 @@ use Rappasoft\LaravelLivewireTables\Views\Filters\DateFilter;
 use Rappasoft\LaravelLivewireTables\Views\Filters\SelectFilter;
 use App\Exports\UsersExport;
 use Maatwebsite\Excel\Facades\Excel;
+use Rappasoft\LaravelLivewireTables\Views\Columns\LinkColumn;
+
 class AttendancesTable extends DataTableComponent
 {
     protected $model = Attendance::class;
 
     protected $listeners = ['deleteRecord' => 'deleteRecord'];
-
+    public $myParam = 'Default';
+    public string $tableName = 'users1';
+    public array $users1 = [];
+    
+    public $columnSearch = [
+        'name' => null,
+        'email' => null,
+    ];
     public function deleteRecord($id)
     {
-        Attendance::find($id)->delete();
+        $attendance = Attendance::find($id);
+        $attendance->delete();
+        Attendance::where('s_no', '>', $attendance->s_no)
+        ->decrement('s_no');
+        Attendance::where('sort', '>', $attendance->sort)
+        ->decrement('sort');
         Flash::success('Attendance deleted successfully.');
         $this->emit('refreshDatatable');
     }
@@ -27,78 +44,72 @@ class AttendancesTable extends DataTableComponent
     public function configure(): void
     {
         $this->setPrimaryKey('id')
-        ->setFiltersEnabled()
-        ->setSingleSortingEnabled()
-        ->setHideReorderColumnUnlessReorderingEnabled()
-        ->setFilterLayoutSlideDown()
-        ->setRememberColumnSelectionDisabled()
-        ->setSecondaryHeaderTrAttributes(function($rows) {
-            return ['class' => 'bg-gray-200 dark:bg-gray-800'];
-        })
-        ->setSecondaryHeaderTdAttributes(function(Column $column, $rows) {
-            if ($column->isField('name')) {
-                return ['class' => 'text-red-500'];
-            }
+            ->setReorderEnabled()
+            ->setHideReorderColumnUnlessReorderingEnabled()
+            ->setSecondaryHeaderTrAttributes(function($rows) {
+                return ['class' => 'bg-gray-100'];
+            })
+            ->setSecondaryHeaderTdAttributes(function(Column $column, $rows) {
+                if ($column->isField('id')) {
+                    return ['class' => 'text-red-500'];
+                }
 
-            return ['default' => true];
-        })
-        ->setFooterTrAttributes(function($rows) {
-            return ['class' => 'bg-gray-100'];
-        })
-        ->setFooterTdAttributes(function(Column $column, $rows) {
-            if ($column->isField('name')) {
-                return ['class' => 'text-green-500'];
-            }
+                return ['default' => true];
+            })
+            ->setFooterTrAttributes(function($rows) {
+                return ['class' => 'bg-gray-100'];
+            })
+            ->setFooterTdAttributes(function(Column $column, $rows) {
+                if ($column->isField('name')) {
+                    return ['class' => 'text-green-500'];
+                }
 
-            return ['default' => true];
-        })
-        ->setUseHeaderAsFooterEnabled()
-        ->setBulkActionsEnabled();
-//        $this->setDebugEnabled();
-        $this->setDefaultReorderSort('id', 'desc');
-        $this->setReorderEnabled();
-
-        $this->setReorderMethod('changeOrder');    
-        $this->setPrimaryKey('id')
-        ->setTableRowUrl(function($row) {
+                return ['default' => true];
+            })
+            ->setHideBulkActionsWhenEmptyEnabled();
+        $this->setTableRowUrl(function($row) {
             return route('attendances.show', $row);
         });
+        
+        $this->setTableRowUrlTarget(function($row) {
+            return '_blank';
+        });
+        $this->setAdditionalSelects(['attendances.id as id']);
+        $this->setReorderMethod('changeOrder');
+
         
     }
    
     public function columns(): array
     {
         return [
-            
+            Column::make('Order', 'sort')
+                ->sortable()
+                ->unclickable()
+                ->collapseOnMobile()
+                ->excludeFromColumnSelect(),
             Column::make("S-No", "s_no")
                 ->sortable()
                 ->searchable()
                 ->unclickable()
-                
-            ->secondaryHeader(function($rows) {
-                return 'Total: ' . $rows->count();
-                })
-                ->format(
-                    function($value,$row){
-                        if ($value=== null) {
-                            static $count = 1;
-                            $value = $count;
-                            $count++;
-                        }
-                        return $value;  
-                    }
-                ),
+                ,
             Column::make("Name", "name")
                 ->sortable()
                 ->searchable()
-                ->secondaryHeader(function($rows) {
-                    return 'Total Employees: ' . $rows->count();
-                    })
+                
                 ->format(
                     function($value,$row){
                         return $row['employee']['name'];  
                     }
-                ),
+                    )
+                    ->secondaryHeader(function() {
+                        return view('tables.cells.input-search', ['field' => 'name', 'columnSearch' => $this->columnSearch]);
+                    })
+                    ->footer(function($rows) {
+                        return '<strong>Name Footer</strong>';
+                    })
+                    ->html(),
+                
             Column::make("Attendance", "attendance")
                 ->sortable()
                 ->searchable()
@@ -119,13 +130,14 @@ class AttendancesTable extends DataTableComponent
                     }
                 ),
             Column::make("Actions", 'id')
-                ->format(
+            ->format(
                     fn($value, $row, Column $column) => view('common.livewire-tables.actions', [
                         'showUrl' => route('attendances.show', $row->id),
                         'editUrl' => route('attendances.edit', $row->id),
                         'recordId' => $row->id,
                     ])
-                )
+                    )
+                    ->unclickable()
         ];
     }
     
@@ -166,6 +178,11 @@ class AttendancesTable extends DataTableComponent
         ];
     }
 
+    public function builder(): Builder
+    {
+        return Attendance::query()
+            ->when($this->columnSearch['name'] ?? null, fn ($query, $name) => $query->where('attendances.name', 'like', '%' . $name . '%'));
+    }
     public function bulkActions(): array
     {
         return [
@@ -175,7 +192,7 @@ class AttendancesTable extends DataTableComponent
     
     public function export()
     {
-        $users = $this->getSelected();
+        $attendance = $this->getSelected();
     
         $this->clearSelected();
         return Excel::download(new UsersExport, 'Attendance.csv', \Maatwebsite\Excel\Excel::XLSX);
@@ -187,4 +204,6 @@ class AttendancesTable extends DataTableComponent
             Attendance::find((int)$item['value'])->update(['sort' => (int)$item['order']]);
         }
     }
+    
+    
 }
