@@ -75,9 +75,9 @@ class AttendancesTable extends DataTableComponent
             return '_blank';
         });
         $this->setAdditionalSelects(['attendances.id as id']);
-        $this->setReorderMethod('changeOrder');
 
-        
+        $this->setFilterLayoutSlideDown();
+
     }
    
     public function columns(): array
@@ -102,7 +102,8 @@ class AttendancesTable extends DataTableComponent
                         return $row['employee']['name'];  
                     }
                     )
-                    ->secondaryHeader(function() {
+                    ->secondaryHeader(function($row) {
+                            
                         return view('tables.cells.input-search', ['field' => 'name', 'columnSearch' => $this->columnSearch]);
                     })
                     ->footer(function($rows) {
@@ -201,7 +202,9 @@ class AttendancesTable extends DataTableComponent
     public function reorder($items): void
     {
         foreach ($items as $item) {
-            Attendance::find((int)$item['value'])->update(['sort' => (int)$item['order']]);
+            $applicationSettings = Attendance::find((int)$item['value']);
+            $applicationSettings->sort = $item['order'];
+            $applicationSettings->save();
         }
     }
     
